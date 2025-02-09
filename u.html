@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en"> 
+ <head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>Draggable Papers and Polaroids</title> 
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zeyada&amp;display=swap"> 
+ <style type="text/css" id="dcoder_stylesheet">body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: url("https://www.psdgraphics.com/wp-content/uploads/2022/01/white-math-paper-texture.jpg");
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+  font-family: 'Zeyada', cursive;
+}
+
+/* Paper Styling */
+.paper {
+  position: absolute;
+  padding: 20px 50px;
+  background-color: #fff;
+  background-image: url("https://i0.wp.com/textures.world/wp-content/uploads/2018/10/2-Millimeter-Paper-Background-copy.jpg?ssl=1");
+  background-size: 500px;
+  background-position: center;
+  box-shadow: 1px 15px 20px rgba(0, 0, 0, 0.3);
+  transform: rotateZ(-5deg);
+  cursor: grab;
+  user-select: none;
+}
+
+.paper.red {
+  background-color: #ffebee;
+}
+
+.paper p {
+  margin: 0;
+  font-size: 30px;
+  color: #333;
+  text-align: center;
+}
+
+/* Button Styling */
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 20px;
+  font-family: 'Zeyada', cursive;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #ffebee;
+  box-shadow: 1px 3px 5px rgba(0, 0, 0, 0.2);
+}
+
+button:hover {
+  background-color: #ffcdd2;
+}
+
+/* Polaroid Styling */
+.polaroid {
+  position: absolute;
+  width: 200px;
+  padding: 15px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transform: rotateZ(5deg);
+  cursor: grab;
+  user-select: none;
+}
+
+.polaroid img {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.polaroid p {
+  margin: 0;
+  font-size: 20px;
+  text-align: center;
+  color: #333;
+}
+
+/* Emotional Message Styling */
+#emotionalMessage {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  display: none;
+}
+
+#emotionalMessage h1 {
+  font-size: 50px;
+  color: #e91e63;
+  margin-bottom: 20px;
+}
+
+#emotionalMessage p {
+  font-size: 30px;
+  color: #333;
+}
+
+.hidden {
+  display: none;
+}</style></head> 
+ <body> <!-- Draggable Papers --> 
+  <div class="paper"> 
+   <p>Drag me around!</p> 
+   <p>Will you be my Valentine?</p> 
+   <div class="buttons"> <button id="yesButton">Yes</button> <button id="noButton">No</button> 
+   </div> 
+  </div> 
+  <div class="paper red"> 
+   <p>You're amazing! ❤️</p> 
+  </div> <!-- Draggable Polaroids --> 
+  <div class="polaroid"> <!-- ✅ Fixed Google Drive Image Link --> 
+   <img src="https://raw.githubusercontent.com/Ranveer-afk/Hu/refs/heads/main/IMG_0324.jpg" alt="Polaroid">
+
+   <p>Memories</p> 
+  </div> 
+  <div class="polaroid"> 
+   <img src="https://via.placeholder.com/200" alt="Photo 2"> 
+   <p>Adventures</p> 
+  </div> 
+  <div class="polaroid"> 
+   <img src="https://via.placeholder.com/200" alt="Photo 3"> 
+   <p>Sunset</p> 
+  </div> 
+  <div class="polaroid"> 
+   <img src="https://via.placeholder.com/200" alt="Photo 4"> 
+   <p>Beach Day</p> 
+  </div> 
+  <div class="polaroid"> 
+   <img src="https://via.placeholder.com/200" alt="Photo 5"> 
+   <p>Mountains</p> 
+  </div> 
+  <div class="polaroid"> 
+   <img src="https://via.placeholder.com/200" alt="Photo 6"> 
+   <p>City Lights</p> 
+  </div> <!-- Emotional Message --> 
+  <div id="emotionalMessage" class="hidden"> 
+   <h1>You've Made Me the Happiest Person! ❤️</h1> 
+   <p>Every moment with you is a treasure. I can't wait to spend forever with you. I love you to the moon and back! 🌙✨</p> 
+  </div> <!-- Audio for Song --> 
+  <audio id="valentineSong" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio> 
+ 
+<script type="text/javascript" id="dcoder_script">let highestZ = 1;
+
+class Draggable {
+  constructor(element) {
+    this.element = element;
+    this.isDragging = false;
+    this.currentX = 0;
+    this.currentY = 0;
+    this.offsetX = 0;
+    this.offsetY = 0;
+    this.rotation = Math.random() * 30 - 15; // Random initial rotation
+    this.init();
+  }
+
+  init() {
+    this.element.addEventListener('mousedown', this.onMouseDown.bind(this));
+    this.element.addEventListener('touchstart', this.onTouchStart.bind(this), { passive: false });
+    this.element.style.transform = `rotateZ(${this.rotation}deg)`;
+  }
+
+  onMouseDown(e) {
+    this.isDragging = true;
+    this.offsetX = e.clientX - this.element.getBoundingClientRect().left;
+    this.offsetY = e.clientY - this.element.getBoundingClientRect().top;
+    this.element.style.zIndex = highestZ++;
+    document.addEventListener('mousemove', this.onMouseMove.bind(this));
+    document.addEventListener('mouseup', this.onMouseUp.bind(this));
+  }
+
+  onTouchStart(e) {
+    this.isDragging = true;
+    const touch = e.touches[0];
+    this.offsetX = touch.clientX - this.element.getBoundingClientRect().left;
+    this.offsetY = touch.clientY - this.element.getBoundingClientRect().top;
+    this.element.style.zIndex = highestZ++;
+    document.addEventListener('touchmove', this.onTouchMove.bind(this), { passive: false });
+    document.addEventListener('touchend', this.onTouchEnd.bind(this));
+  }
+
+  onMouseMove(e) {
+    if (this.isDragging) {
+      this.currentX = e.clientX - this.offsetX;
+      this.currentY = e.clientY - this.offsetY;
+      this.element.style.left = `${this.currentX}px`;
+      this.element.style.top = `${this.currentY}px`;
+    }
+  }
+
+  onTouchMove(e) {
+    if (this.isDragging) {
+      const touch = e.touches[0];
+      this.currentX = touch.clientX - this.offsetX;
+      this.currentY = touch.clientY - this.offsetY;
+      this.element.style.left = `${this.currentX}px`;
+      this.element.style.top = `${this.currentY}px`;
+    }
+  }
+
+  onMouseUp() {
+    this.isDragging = false;
+    document.removeEventListener('mousemove', this.onMouseMove.bind(this));
+    document.removeEventListener('mouseup', this.onMouseUp.bind(this));
+  }
+
+  onTouchEnd() {
+    this.isDragging = false;
+    document.removeEventListener('touchmove', this.onTouchMove.bind(this));
+    document.removeEventListener('touchend', this.onTouchEnd.bind(this));
+  }
+}
+
+// Initialize all papers and polaroids
+const papers = document.querySelectorAll('.paper');
+const polaroids = document.querySelectorAll('.polaroid');
+
+papers.forEach(paper => new Draggable(paper));
+polaroids.forEach(polaroid => new Draggable(polaroid));
+
+// Valentine Message Logic
+const yesButton = document.getElementById('yesButton');
+const noButton = document.getElementById('noButton');
+const emotionalMessage = document.getElementById('emotionalMessage');
+const valentineSong = document.getElementById('valentineSong');
+
+yesButton.addEventListener('click', () => {
+  emotionalMessage.style.display = 'block'; // Show emotional message
+  valentineSong.play(); // Play the song
+});
+
+noButton.addEventListener('click', () => {
+  alert("Oh no! Maybe next time? 😢");
+  noButton.style.position = 'absolute';
+  noButton.style.left = `${Math.random() * window.innerWidth}px`;
+  noButton.style.top = `${Math.random() * window.innerHeight}px`;
+});</script></body></html>
